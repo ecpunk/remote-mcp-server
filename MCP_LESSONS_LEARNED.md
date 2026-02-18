@@ -22,6 +22,13 @@ This summarizes practical issues encountered while bringing up an authless remot
 - `curl --max-time` may exit with timeout even when initialize succeeded.
 - Validate by checking first `event: message` / `data:` payload, not only curl exit code.
 
+## 4a) Browser CORS Is a Real Connector Gate
+- Browser-based connectors can fail even when direct server/curl checks pass.
+- Ensure CORS allows Claude web origins:
+  - `https://claude.ai`
+  - `https://app.claude.ai`
+- Missing CORS response headers may look like generic auth/connection failures in the UI.
+
 ## 5) DNS Can Be Correct Publicly and Wrong Locally
 - Public resolvers returned correct answers while local resolver returned empty.
 - Troubleshoot with both:
@@ -45,3 +52,8 @@ This summarizes practical issues encountered while bringing up an authless remot
 - Remove app/domain-specific details unless needed.
 - Never commit real secrets, tokens, or credential files.
 - Keep docs generic and reusable; keep local deployment specifics private.
+
+## 9) Wildcard Certificate Ops Gotcha
+- Wildcard certs (`*.example.com`) require DNS challenge for issuance and renewal.
+- HTTP challenge is not sufficient for wildcard renewals.
+- Confirm renewal automation (`certbot.timer`/cron) and periodically run `certbot renew --dry-run`.

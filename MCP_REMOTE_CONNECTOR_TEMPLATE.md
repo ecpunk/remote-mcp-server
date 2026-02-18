@@ -87,6 +87,20 @@ Notes:
 - Mapping both `/` and `/mcp` helps with connector clients that probe root first.
 - Keep streaming/buffering settings compatible with SSE/streamable responses.
 
+## 4a) Browser CORS Requirements (Claude Web)
+- If your MCP endpoint is called from a browser-based client, CORS must explicitly allow Claude origins.
+- At minimum, allow:
+  - `https://claude.ai`
+  - `https://app.claude.ai`
+- Missing CORS headers can make a connector fail in-browser even when `curl` tests pass.
+- Also allow methods/headers used by MCP requests (`POST`, `OPTIONS`, `Content-Type`, `Accept`).
+
+Example allow-list (app/server config):
+
+```text
+ALLOW_ORIGINS=https://claude.ai,https://app.claude.ai
+```
+
 ## 5) Test Matrix (Copy/Paste)
 
 Local test:
@@ -125,3 +139,14 @@ Version compatibility tests:
 - [ ] Proxy buffering disabled for stream endpoint
 - [ ] Secrets excluded from git (`.secrets/`, API keys, tokens)
 - [ ] Health/logging in place for quick connector triage
+
+## 8) Wildcard SSL + Renewal Note
+- If you use a wildcard certificate (`*.example.com`), do not use HTTP challenge for issuance/renewal.
+- Wildcard certs require DNS challenge.
+- Example pattern:
+
+```bash
+certbot certonly --authenticator dns-<provider> ... -d example.com -d "*.example.com"
+```
+
+- Ensure auto-renewal is configured (`certbot.timer` via systemd or a cron job) and test with dry-run.
