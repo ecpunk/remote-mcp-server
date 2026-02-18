@@ -57,3 +57,23 @@ This summarizes practical issues encountered while bringing up an authless remot
 - Wildcard certs (`*.example.com`) require DNS challenge for issuance and renewal.
 - HTTP challenge is not sufficient for wildcard renewals.
 - Confirm renewal automation (`certbot.timer`/cron) and periodically run `certbot renew --dry-run`.
+
+## 10) AI Chat Endpoints Benefit From Live Data Context Injection
+- For project copilots, generic prompts underperform without current project state.
+- Inject a compact snapshot of live records (e.g., room/task/status/owner/priority) into the system prompt.
+- Build this snapshot server-side at request time so responses reflect latest state.
+
+## 11) Keep Short Per-Session Conversation Memory Server-Side
+- Preserve a bounded window (e.g., last 10 messages) to support follow-up questions.
+- Key history by authenticated user/session identifier and trim aggressively.
+- This gives continuity without unbounded token growth or long-lived state risks.
+
+## 12) Gate AI Endpoints With User JWT, Not Service Keys
+- AI chat endpoints should require user authentication, not only backend service credentials.
+- Keep MCP/service API-key access scoped to machine-to-machine routes where needed.
+- This separation reduces accidental exposure of expensive model endpoints.
+
+## 13) Keep Provider Secrets Server-Side Only
+- Browser clients should never receive provider API keys.
+- Frontend calls backend endpoints; backend injects secrets from environment/config.
+- Validate logs and error payloads to ensure no secret/token leakage.
